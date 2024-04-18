@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shooter Game</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+ <div class="copyright">
+    &copy; 2024 Playz. All rights reserved.
+</div>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let player = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 20,
+            height: 20,
+            speed: 5,
+            isAlive: true,
+            hasUpgrade: false
+        };
+
+        let keysPressed = {};
+        let spacePressed = false;
+        let enemies = [];
+        let bullets = [];
+        let score = 0;
+        let round = 1; // Start from round 1
+
+        function drawPlayer() {
+            if (player.isAlive) {
+                ctx.fillStyle = player.hasUpgrade ? "#0f0" : "#00f";
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+            }
+        }
+
+        function drawEnemies() {
+            ctx.fillStyle = "#f00";
+            enemies.forEach(enemy => {
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            });
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = "#f00";
+            bullets.forEach(bullet => {
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+        }
+
+        function drawScore() {
+            ctx.fillStyle = "#000";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+        }
+
+        function drawRound() {
+            ctx.fillStyle = "#000";
+            ctx.font = "20px Arial";
+            ctx.fillText("Round: " + round, canvas.width - 100, 30);
+        }
+
+        function update() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw player
+            drawPlayer();
+
+            // Draw enemies
+            drawEnemies();
+
+            // Draw bullets
+            drawBullets();
+
+            // Draw score
+            drawScore();
+
+            // Draw round
+            drawRound();
+
+            // Update enemies position
+            enemies.forEach(enemy => {
+                if (player.isAlive) {
+                    // Move enemy towards the player
+                    if (enemy.x > player.x) enemy.x -= 2;
+                    else if (enemy.x < player.x) enemy.x += 2;
+                    if (enemy.y > player.y) enemy.y -= 2;
+                    else if (enemy.y < player.y) enemy.y += 2;
+
+                    // Check for collision with player
+                    if (
+                        player.isAlive &&
+                        enemy.x < player.x + player.width &&
+                        enemy.x + enemy.width > player.x &&
+                        enemy.y < player.y + player.height &&
+                        enemy.y + enemy.height > player.y
+                    ) {
+                        player.isAlive = false;
+                    }
+                }
+            });
+
+            // Update bullets position
+            bullets.forEach(bullet => {
+                bullet.x += bullet.speed;
+            });
+
+            // Remove bullets that went off-screen
+            bullets = bullets.filter(bullet => bullet.x < canvas.width);
+
+            // Check for bullet-enemy collisions
+            bullets.forEach((bullet, bulletIndex) => {
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (
+                        bullet.x < enemy.x + enemy.width &&
+                        bullet.x + bullet.width > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + bullet.height > enemy.y
+                    ) {
+                        // Remove the bullet
+                        bullets.splice(bulletIndex, 1);
+
+                        // Decrease enemy health
+                        enemy.health -= 1;
+
+                        // If enemy health is 0, remove enemy
+                        if (enemy.health <= 0) {
+                            enemies.splice(enemyIndex, 1);
+                            score += 10; // Increase score
+                        }
+                    }
+                });
+            });
+
+            // Game over, reset if player is dead
+            if (!player.isAlive) {
+                setTimeout(() => {
+                    player = {
+                        x: 50,
+                        y: canvas.height / 2,
+                        width: 20,
+                        height: 20,
+                        speed: 5,
+                        isAlive: true,
+                        hasUpgrade: false
+                    };
+                    enemies = [];
+                    bullets = [];
+                    score = 0;
+                    round = 1; // Reset round to 1
+                }, 1000); // Reset after 1 second
+            }
+
+            // Prevent player from going out of bounds
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            if (player.y < 0) player.y = 0;
+            if (player.y + player.height > canvas.height) player.y = canvas.height - player.height;
+
+            // Update player position based on keys pressed
+            if (keysPressed["w"]) player.y -= player.speed;
+            if (keysPressed["a"]) player.x -= player.speed;
+            if (keysPressed["s"]) player.y += player.speed;
+            if (keysPressed["d"]) player.x += player.speed;
+
+            // Shoot bullets if spacebar is pressed
+            if (spacePressed) {
+                shoot();
+            }
+
+            // Check if all enemies are defeated, then move to the next round
+            if (enemies.length === 0) {
+                round++;
+                let numEnemies = 10 + round - 1; // Increase by 1 each round
+                for (let i = 0; i < numEnemies; i++) {
+                    enemies.push({
+                        x: canvas.width - 20,
+                        y: Math.random() * (canvas.height - 20),
+                        width: 20,
+                        height: 20,
+                        health: 5
+                    });
+                }
+            }
+        }
+
+        function shoot() {
+            bullets.push({
+                x: player.x + player.width,
+                y: player.y + player.height / 2,
+                width: 5,
+                height: 5,
+                speed: 10
+            });
+        }
+
+        document.addEventListener("keydown", event => {
+            keysPressed[event.key] = true;
+
+            if (!player.isAlive) return; // Player can't move if dead
+
+            if (event.key === " ") { // Spacebar to shoot
+                spacePressed = true;
+            }
+        });
+
+        document.addEventListener("keyup", event => {
+            delete keysPressed[event.key];
+
+            if (event.key === " ") { // Spacebar released
+                spacePressed = false;
+            }
+        });
+
+        function gameLoop() {
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Generate enemies for the first round
+        for (let i = 0; i < 10; i++) {
+            enemies.push({
+                x: canvas.width - 20,
+                y: Math.random() * (canvas.height - 20),
+                width: 20,
+                height: 20,
+                health: 5
+            });
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

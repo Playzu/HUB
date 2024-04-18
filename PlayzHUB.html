@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playz Hub</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #000;
+    }
+    .header {
+        text-align: center;
+        padding: 20px;
+        background-color: #333;
+        color: #fff;
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: space-between;
+        height: calc(100% - 50px); /* Odejmujemy wysokość nagłówka */
+    }
+    .square {
+        width: calc(25% - 20px); /* 25% szerokości strony minus marginesy */
+        height: 300px; /* Dostosuj wysokość kwadratu według potrzeb */
+        background-color: #000;
+        margin: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .square a {
+        color: #fff; /* Kolor tekstu na biały */
+        text-decoration: none;
+        font-size: 24px;
+    }
+    .button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .button:hover {
+        background-color: #555;
+    }
+    .copyright {
+        position: fixed;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        color: #777;
+    }
+</style>
+</head>
+<body>
+<div class="header">
+    <h1>Playz Hub</h1>
+</div>
+<div class="container">
+    <div class="square">
+        <h2><a href="link1.html">Link 1</a></h2>
+        <button class="button" onclick="window.location.href='link1.html'">Go</button>
+    </div>
+    <div class="square">
+        <h2><a href="link2.html">Link 2</a></h2>
+        <button class="button" onclick="window.location.href='link2.html'">Go</button>
+    </div>
+    <div class="square">
+        <h2><a href="link3.html">Link 3</a></h2>
+        <button class="button" onclick="window.location.href='link3.html'">Go</button>
+    </div>
+    <div class="square">
+        <h2><a href="link4.html">Link 4</a></h2>
+        <button class="button" onclick="window.location.href='link4.html'">Go</button>
+    </div>
+</div>
+<div class="copyright">
+    &copy; 2024 Playz. All rights reserved.
+</div>
+</body>
+</html>
