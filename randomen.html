@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Randomen</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+    }
+    input {
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #FF0000;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #EE8080;
+    }
+    #result {
+        font-size: 20px;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<h1>Randomen</h1>
+<input type="text" id="itemInput" placeholder="Wpisz słowo">
+<button onclick="addToList()">Dodaj</button>
+<div id="result"></div>
+<div class="copyright">
+    &copy; 2024 Playz. All rights reserved.
+</div>
+<script>
+function addToList() {
+    var item = document.getElementById("itemInput").value;
+    if (item.trim() === "") {
+        alert("Proszę wpisać coś!");
+        return;
+    }
+    if (localStorage.getItem("items") === null) {
+        localStorage.setItem("items", JSON.stringify([]));
+    }
+    var items = JSON.parse(localStorage.getItem("items"));
+    if (items.length >= 100) {
+        alert("Osiągnięto maksymalną liczbę słów (100)!");
+        return;
+    }
+    items.push(item);
+    localStorage.setItem("items", JSON.stringify(items));
+    document.getElementById("itemInput").value = "";
+}
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        var items = JSON.parse(localStorage.getItem("items"));
+        if (items.length === 0) {
+            alert("Brak dodanych słów!");
+            return;
+        }
+        var randomIndex = Math.floor(Math.random() * items.length);
+        var result = items[randomIndex];
+        document.getElementById("result").textContent = "Wylosowane słowo: " + result;
+    }
+});
+</script>
+</body>
+</html>
